@@ -1,0 +1,22 @@
+<div class="page-width min-heits">
+  {%- render 'breadcrumbs' -%}
+  <div class="default-breadcrumbs default-breadcrumbs--min-heits">
+    {% if product.metafields.custom.product_page_collection %}
+      {%- assign collection_id = product.metafields.custom.product_page_collection
+        | split: '/'
+        | last
+        | plus: 0
+      -%}
+      {% for collection in collections %}
+        {% if collection.id == collection_id %}
+          {% assign collection_name = collection.handle %}
+        {% endif %}
+      {% endfor %}
+      <div>
+        <a href="{{ routes.root_url }}">{{ 'general.breadcrumbs.home' | t }}</a> >
+        <a href="{{ routes.collections_url }}">{{ 'labels.collections' | t }}</a> >
+        <a href="{{ collections[collection_name].url }}">{{ collections[collection_name].title }}</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
