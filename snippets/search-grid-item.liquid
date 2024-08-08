@@ -1,4 +1,4 @@
-{% # components v2.10.64 | Copyright © 2024 Archetype Themes Limited Partnership  | "Shopify Theme Store (https://www.shopify.com/legal/terms#9-additional-services)" License  %}
+{% # components v2.10.64 | Copyright © 2024 Archetype Themes Limited Partnership  | "Shopify Theme Store (https://www.shopify.com/legal/terms#9-additional-services)" License %}
 {%- comment -%}
   Renders a grid item for search results.
 
@@ -9,29 +9,33 @@
   {% render 'search-grid-item', item: item %}
 {%- endcomment -%}
 
-<div class="grid-item grid-product">
-  <div class="grid-item__content">
-    <a href="{{ item.url }}" class="grid-item__link">
-      {%- if item.object_type == 'article' and item.image -%}
-        <div class="grid-product__image-wrap">
-          {%- render 'image-element',
-            img: item.image,
-            classes: 'grid-product__image',
-            alt: item.title,
-            widths: '180, 360, 540',
-            sizes: sizes,
-            sizeVariable: sizeVariable,
-            fallback: fallback
-          -%}
-        </div>
-      {%- endif -%}
+{% assign item_title_lowercase = item.title | downcase %}
 
-      <div class="grid-item__meta">
-        <span class="h4">{{ item.title }}</span>
-        <div>
-          {{ item.content | strip_html | truncatewords: 45 }}
+{% unless item_title_lowercase contains 'sitemap' %}
+  <div class="grid-item grid-product">
+    <div class="grid-item__content">
+      <a href="{{ item.url }}" class="grid-item__link">
+        {%- if item.object_type == 'article' and item.image -%}
+          <div class="grid-product__image-wrap">
+            {%- render 'image-element',
+              img: item.image,
+              classes: 'grid-product__image',
+              alt: item.title,
+              widths: '180, 360, 540',
+              sizes: sizes,
+              sizeVariable: sizeVariable,
+              fallback: fallback
+            -%}
+          </div>
+        {%- endif -%}
+
+        <div class="grid-item__meta">
+          <span class="h4">{{ item.title }}</span>
+          <div>
+            {{ item.content | strip_html | truncatewords: 45 }}
+          </div>
         </div>
-      </div>
-    </a>
+      </a>
+    </div>
   </div>
-</div>
+{% endunless %}
