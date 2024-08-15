@@ -1,9 +1,8 @@
 <!doctype html>
 <html class="no-js" lang="{{ request.locale.iso_code }}" dir="{{ settings.text_direction }}">
   <head>
-	{% render 'pandectes-rules' %}
-	
-	
+    {% render 'pandectes-rules' %}
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -50,7 +49,7 @@
       endunless
     -%}
 
-     <script>
+    <script>
       // HC - 20/6/2024 Breadcrumbs
       // Function to check URL and handle session storage
       (function () {
@@ -72,21 +71,18 @@
         const product = getProductFromURL(currentURL);
 
         // Check if there's a saved product in sessionStorage
-        const previousProduct = sessionStorage.getItem("previousProduct");
+        const previousProduct = sessionStorage.getItem('previousProduct');
 
         // Check if the URL contains /collections/ and /products/ and save the extracted part to sessionStorage
-        if (
-          currentURL.includes("/collections/") &&
-          currentURL.includes("/products/")
-        ) {
-          sessionStorage.setItem("previousCollection", collection);
-          sessionStorage.setItem("previousProduct", product);
+        if (currentURL.includes('/collections/') && currentURL.includes('/products/')) {
+          sessionStorage.setItem('previousCollection', collection);
+          sessionStorage.setItem('previousProduct', product);
         } else if (previousProduct != product) {
-          sessionStorage.setItem("previousCollection", "");
-          sessionStorage.setItem("previousProduct", "");
-          document.addEventListener("DOMContentLoaded", function () {
-            const breadcrumbs = document.querySelectorAll(".custom-breadcrumbs");
-            const defaultBreadcrumbs = document.querySelectorAll(".default-breadcrumbs");
+          sessionStorage.setItem('previousCollection', '');
+          sessionStorage.setItem('previousProduct', '');
+          document.addEventListener('DOMContentLoaded', function () {
+            const breadcrumbs = document.querySelectorAll('.custom-breadcrumbs');
+            const defaultBreadcrumbs = document.querySelectorAll('.default-breadcrumbs');
             breadcrumbs.forEach(function (breadcrumb) {
               if (breadcrumb) {
                 breadcrumb.remove();
@@ -101,32 +97,31 @@
         }
 
         // Check if there's a saved collection in sessionStorage
-        const previousCollection = sessionStorage.getItem("previousCollection");
-        document.addEventListener("DOMContentLoaded", function () {
-          const collectionNameElements = document.querySelectorAll(".collectionName");
+        const previousCollection = sessionStorage.getItem('previousCollection');
+        document.addEventListener('DOMContentLoaded', function () {
+          const collectionNameElements = document.querySelectorAll('.collectionName');
           let allCollections, names;
           // add file URL here
           fetch(
-            "https://cdn.shopify.com/s/files/1/0483/3158/7741/files/collections-names_f28293a9-6697-4777-b802-9f95df34d76c.json?v=1720775250"
+            'https://cdn.shopify.com/s/files/1/0483/3158/7741/files/collections-names_f28293a9-6697-4777-b802-9f95df34d76c.json?v=1720775250'
           )
             .then((response) => response.json())
             .then((data) => {
               names = data;
             });
-          fetch("https://goodevas.com/collections.json?limit=50")
+          fetch('https://goodevas.com/collections.json?limit=50')
             .then((response) => response.json()) // Parse response as JSON
             .then((collections) => {
               allCollections = collections;
-              console.log(collections)
+              console.log(collections);
               collectionNameElements.forEach(function (collectionNameElement) {
                 if (collectionNameElement) {
-                  collectionNameElement.href =
-                    collectionNameElement.href + "/collections/" + previousCollection;
+                  collectionNameElement.href = collectionNameElement.href + '/collections/' + previousCollection;
                   allCollections.collections.forEach((collection) => {
-                    console.log(collection.handle, previousCollection)
+                    console.log(collection.handle, previousCollection);
                     if (collection.handle == previousCollection) {
                       collectionNameElement.innerHTML = getTranslation(
-                        "{{ localization.language.iso_code}}",
+                        '{{ localization.language.iso_code}}',
                         collection.title,
                         names
                       );
@@ -142,16 +137,13 @@
       function getTranslation(languageCode, collectionTitle, names) {
         for (const collection in names.collections) {
           if (names.collections[collection].en === collectionTitle) {
-            return (
-              names.collections[collection][languageCode] ||
-              "Translation not available"
-            );
+            return names.collections[collection][languageCode] || 'Translation not available';
           }
         }
-        return "Collection title not found";
+        return 'Collection title not found';
       }
     </script>
-    
+
     <script>
       document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
 
@@ -205,29 +197,73 @@
     <script>
       // HC - June 2024 - Remove /collections/[collectionName] from url
       (function () {
-          const url = window.location.href;
-          const collectionsString = '/collections/';
-          const productsString = '/products/';
+        const url = window.location.href;
+        const collectionsString = '/collections/';
+        const productsString = '/products/';
 
-          if (url.includes(collectionsString) && url.includes(productsString)) {
-            const collectionsIndex = url.indexOf(collectionsString);
+        if (url.includes(collectionsString) && url.includes(productsString)) {
+          const collectionsIndex = url.indexOf(collectionsString);
 
-            const productsIndex = url.indexOf(productsString);
+          const productsIndex = url.indexOf(productsString);
 
-            if (productsIndex > collectionsIndex) {
-              const newUrl = url.substring(0, collectionsIndex) + url.substring(productsIndex);
-              window.history.replaceState({}, document.title, newUrl);
-            }
+          if (productsIndex > collectionsIndex) {
+            const newUrl = url.substring(0, collectionsIndex) + url.substring(productsIndex);
+            window.history.replaceState({}, document.title, newUrl);
           }
+        }
       })();
-    </script>    
-    
+    </script>
+
     {%- render 'import-map' -%}
     {%- render 'es-module-shims' -%}
     {%- render 'is-land' -%}
     {%- render 'preload-js' -%}
 
-    {{ content_for_header }}
+    {% # theme-check-disable %}
+
+    {% capture content_for_header_custom %}
+      {{ content_for_header }}
+    {% endcapture %}
+
+    {% assign content_for_header_filtered = '' %}
+
+    {% assign lines = content_for_header_custom | split: '\n' %}
+
+    {% for line in lines %}
+      {% if line contains 'hreflang="' %}
+        {{
+          line
+          | replace: '<link rel="alternate" hreflang="en-JE" href="https://goodevas.com/en-gb">', ''
+          | replace: '<link rel="alternate" hreflang="en-CA" href="https://goodevas.com/en-ca">',
+            '<link rel="alternate" hreflang="en-CA" href="https://goodevas.ca">'
+          | replace: '<link rel="alternate" hreflang="fr-CA" href="https://goodevas.com/fr-ca">',
+            '<link rel="alternate" hreflang="fr-CA" href="https://goodevas.ca/fr">'
+          | replace: '<link rel="alternate" hreflang="fr-AT" href="https://goodevas.com/fr-at">', ''
+          | replace: '<link rel="alternate" hreflang="ar-QA" href="https://goodevas.com/ar-qa">',
+            '<link rel="alternate" hreflang="ar-QA" href="https://goodevas.ae/ar-qa">'
+          | replace: '<link rel="alternate" hreflang="en-QA" href="https://goodevas.com/en-qa">',
+            '<link rel="alternate" hreflang="en-QA" href="https://goodevas.ae/en-qa">'
+          | replace: '<link rel="alternate" hreflang="ar-KW" href="https://goodevas.com/ar-kw">',
+            '<link rel="alternate" hreflang="ar-KW" href="https://goodevas.ae/ar-kw">'
+          | replace: '<link rel="alternate" hreflang="en-KW" href="https://goodevas.com/en-kw">',
+            '<link rel="alternate" hreflang="en-KW" href="https://goodevas.ae/en-kw">'
+          | replace: '<link rel="alternate" hreflang="ar-AE" href="https://goodevas.com/ar-ae">',
+            '<link rel="alternate" hreflang="ar-AE" href="https://goodevas.com/ar-ae">'
+          | replace: '<link rel="alternate" hreflang="en-AE" href="https://goodevas.com/en-ae">',
+            '<link rel="alternate" hreflang="en-AE" href="https://goodevas.ae/en">'
+          | replace: '<link rel="alternate" hreflang="ar-BH" href="https://goodevas.com/ar-bh">',
+            '<link rel="alternate" hreflang="ar-BH" href="https://goodevas.ae/ar-bh">'
+          | replace: '<link rel="alternate" hreflang="ar-BH" href="https://goodevas.com/ar-bh">',
+            '<link rel="alternate" hreflang="en-BH" href="https://goodevas.ae/en-bh">'
+          | replace: '<link rel="alternate" hreflang="ar-SA" href="https://goodevas.com/ar-sa">',
+            '<link rel="alternate" hreflang="ar-SA" href="https://goodevas.ae/ar-sa">'
+          | replace: '<link rel="alternate" hreflang="en-SA" href="https://goodevas.com/en-sa">',
+            '<link rel="alternate" hreflang="en-SA" href="https://goodevas.ae/en-sa">'
+        }}
+      {% endif %}
+    {% endfor %}
+
+    {% # theme-check-enable %}
 
     <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
 
@@ -268,8 +304,8 @@
       render 'photoswipe-template'
       render 'tool-tip'
     -%}
-    <!-- Widget : Buy Bed Gift swing set  -->
-      <div data-rebuy-id="155052"></div>
-    <!-- End Widget : Buy Bed Gift swing set  -->
+    <!-- Widget : Buy Bed Gift swing set -->
+    <div data-rebuy-id="155052"></div>
+    <!-- End Widget : Buy Bed Gift swing set -->
   </body>
 </html>
